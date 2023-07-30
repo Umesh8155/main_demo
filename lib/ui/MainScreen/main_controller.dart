@@ -1,12 +1,16 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import '../../utils/new_version_plus.dart';
 
 class MainController extends GetxController
     with GetSingleTickerProviderStateMixin {
+
+  static const platform = MethodChannel('MethodChannelID');
+
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   late AnimationController animationController;
@@ -14,6 +18,9 @@ class MainController extends GetxController
   String osVersion = "", deviceName = "", deviceID = "";
 
   String packageName = "", version = "";
+
+  RxString batteryLevel="".obs;
+
 
   @override
   void onInit() {
@@ -24,6 +31,8 @@ class MainController extends GetxController
 
     Future.delayed(Duration.zero, () {
       _checkVersion();
+
+      getDataMethod();
     });
   }
 
@@ -59,6 +68,15 @@ class MainController extends GetxController
     } catch (e) {}
   }
 
+
+  getDataMethod()async{
+    try {
+      final int result = await platform.invokeMethod('getBatteryLevel');
+      batteryLevel.value = 'Battery level at $result % .';
+    } on PlatformException catch (e) {
+      batteryLevel.value = "Failed to get battery level: '${e.message}'.";
+    }
+  }
 
   @override
   void onClose() {

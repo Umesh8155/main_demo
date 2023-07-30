@@ -33,7 +33,7 @@ class MainScreen extends StatelessWidget {
 
   Widget _buildBodyView() {
     return Center(
-      child: Text("data"),
+      child: Obx(() => Text("${controller.batteryLevel}")),
     );
   }
 
